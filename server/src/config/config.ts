@@ -15,7 +15,7 @@ const MONGO_OPTION = {
 
 const MONGO_USERNAME = process.env.MONGO_USERNAME || '127.0.0.1:27017';
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD || '';
-const DATABASE_NAME = process.env.DATABASE_NAME || '';
+const DATABASE_NAME = process.env.DATABASE_NAME || 'dating-app';
 const MONGO_HOST = process.env.MONGO_URL || '';
 
 const MONGO = {

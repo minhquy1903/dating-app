@@ -1,29 +1,46 @@
 import express from 'express';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import http from 'http';
+import morgan from 'morgan';
+
 import config from './config/config';
 import router from './routers/index';
-import connectMongoDB from './config/mongo.connect';
+import mongoConnect from './config/mongo';
+import WebSockets from './utils/WebSockets';
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      io: any;
+    }
+  }
+}
 
 const app: express.Application = express();
 
-app.all('*', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header(
-    'Access-Control-Allow-Methods',
-    'GET,HEAD,OPTIONS,POST,PUT,DELETE',
-  );
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
-  );
-  next();
-});
-
+app.use(cors());
+app.use(morgan('tiny'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use('/api', router);
+app.use('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'API endpoint doesnt exist',
+  });
+});
 
-app.listen(config.server.port, () => {
-  connectMongoDB();
-  console.log(`server is running at ${config.server.port}`);
+const server = http.createServer(app);
+
+global.io = new Server(server);
+
+global.io.on('connection', WebSockets.connection);
+
+server.listen(config.server.port);
+
+server.on('listening', () => {
+  mongoConnect();
+  console.log(`Listening on port:: http://localhost:${config.server.port}`);
 });

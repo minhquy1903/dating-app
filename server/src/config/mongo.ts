@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import config from './config';
 
-const connectMongoDB = () => {
+const mongoConnect = () => {
   console.log(config.mongodb.uri);
   mongoose
     .connect(config.mongodb.uri, config.mongodb.option)
@@ -15,4 +15,4 @@ const connectMongoDB = () => {
     });
 };
 
-export default connectMongoDB;
+export default mongoConnect;
